@@ -28,4 +28,4 @@ There are risks and assumptions from both a data quality perspective and with th
 *placeholder*
 
 ### License
-Licensed under GPLv3
+Licensed under [GPLv3](GPLv3)
