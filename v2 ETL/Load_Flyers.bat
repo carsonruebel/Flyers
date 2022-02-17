@@ -1,2 +1,2 @@
-"C:\Python39\python.exe" "C:\Users\Carson\Desktop\Current Projects\Learning\Programming\Python\Hello World\Flyers\BetterLoadFM.py"
+"C:\Python39\python.exe" "C:\Users\Carson\Desktop\Current Projects\Flyers\GitRepo\Flyers\v2 ETL\DailyLoadFlyers.py"
 pause
