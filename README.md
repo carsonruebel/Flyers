@@ -17,15 +17,23 @@ This project makes use of the following technology:
 ### Risks and Assumptions
 There are risks and assumptions from both a data quality perspective and with the ETL of all three versions
 - Data Quality: Advertisements have no standardization! Some will list a minimum required quantity to get a sale price Some will appear to have a minimum but may not actually be required. Some will combine mix and match of brands and products. Many are broad categories that cover multiple various products without specification. Mitigation for manual entry is to have a specific column specifying if this is for a single product or various, so price trends can be built specifically on individual products.
-- Version 1: Data entry takes incredibly long and is not practical. It takes upwards of 5 hours to input a single store's weekly flyer. Due to this, I've largely moved my time investment to Versions 2 and 3.
-- Version 2: Python script is set to run daily using Windows Task Scheduler. This currently only works when logged in, meaning if my computer is off or locked it will not receive the day's deteails. This could be mitigated by diving deeper into why it doesn't work when logged out, or by scheduling to run much more frequently.
+- Version 1: Data entry takes incredibly long and is not practical. It takes upwards of 5 hours to input a single store's weekly flyer.
+- Version 1: Risk of human error is very high.
+- Version 2: Python script is set to run hourly using Windows Task Scheduler, meaning there is a dependency on my machine being online and logged in frequently enough to capture data.
+- Version 2: Manual work needs to be done periodically to build stored proc calls and execute them to upload data to SQL.
+
+### Credit Due
+Versions 2 and 3 both utilize Flipp API endpoints
+```
+request_url = 'https://backflipp.wishabi.com/flipp/items/search?locale=en-us&postal_code=98125&q=' + storename)
+```
 
 ### Nice to add in future
 - Secure connectivity to SQL with better identity practices
 - Find and implement method to share PowerBI results without incurring $20/month premium charge
 
 ### How to install
-*placeholder*
+*tbd*
 
 ### License
 Licensed under [GPLv3](GPLv3.txt)
