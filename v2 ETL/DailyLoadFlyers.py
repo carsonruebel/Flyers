@@ -20,15 +20,15 @@ def pull_data(storename):
     #df_new.rename(columns={"name": "Product", "merchant_name": "Merchant"}) #placeholder in case I want to rename columns
     #print(df_new)
     #Only uncomment below to start a new file
-    if exists('adhistory.csv') == 0:
-        df_new.to_csv('adhistory.csv', index=False)
+    if exists('adhistory.xlsx') == 0:
+        df_new.to_excel('adhistory.xlsx', index=False)
     #if exists('adhistory2.json') == 0:
     #    df_new.to_json('adhistory2.json')
     return df_new
 
 def merge_data(filename, dataframe):
     #load offline data to dataframe
-    df_old = pd.read_csv(filename + ".csv")
+    df_old = pd.read_excel(filename + ".xlsx")
     #print(df_old)
 
     #append together (with concat?)
@@ -44,7 +44,7 @@ def merge_data(filename, dataframe):
     added_row_count = df_final.shape[0] - df_old.shape[0]
 
     #store back as original file
-    df_final.to_csv(filename + ".csv", index=False)
+    df_final.to_excel(filename + ".xlsx", index=False)
     #df_final.to_json(filename + ".json")
     return added_row_count
 
