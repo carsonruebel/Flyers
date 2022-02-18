@@ -1,5 +1,5 @@
 # Flyers
-This project's goal is to use real-world super market flyer advertisements to track price trends over time of various items. This project has evolved twice, resulting in three semi-functional versions.
+This project's goal is to use real-world super market flyer advertisements to track price trends over time of various items. This project has evolved twice, resulting in three functional versions.
 - Version 1: Manual input from paper flyers
 - Version 2: Python script executing locally daily to pull from public API
 - Version 3: Azure Data Factory to load data from API to SQL using serverless offerings
@@ -10,9 +10,9 @@ This project makes use of the following technology:
 - Version 1 uses Excel formulas to build batch SQL queries to input data into the DB
 - Version 1 makes use of SQL stored procs to parse out SQL spreadsheet into normalized dim/fact tables
 - Version 2 uses Python to pull and append flyer details from a public API to a CSV file
-- Version 2 *will use* new SQL stored procs to parse out CSV file into a separate data model of dim/fact tables (due to different details available)
-- Version 3 *will use* Azure Data Factory to extract, transform, and load data from a public API directly to the DB
-- All versions *will make use of* PowerBI to view the data with slicers to select individual products, families of products, and stores to view price trends over time
+- Version 2 uses SQL stored procs to parse out CSV file into a v2 data model of dim/fact tables (due to different details available)
+- Version 3 uses Azure Data Factory to extract, transform, and load data from a public API into a v3 data model of dim/fact tables (due to inclusion of daily loaddate attribute)
+- All versions make use of PowerBI to view the data with slicers to select individual products, families of products, and stores to view price trends over time
 
 ### Risks and Assumptions
 There are risks and assumptions from both a data quality perspective and with the ETL of all three versions
