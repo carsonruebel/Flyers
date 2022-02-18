@@ -11,7 +11,7 @@ CREATE TABLE DIM_Merchant_v2 (
 CREATE TABLE DIM_Product_v2 (
     ProductID INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
     Brand_Product VARCHAR(100) NOT NULL,
-	Category VARCHAR(100) NOT NULL,
+	Category VARCHAR(100) NULL,
 	pre_price_text VARCHAR(100) NULL,
 	URI VARCHAR(255) NOT NULL
 );
@@ -47,11 +47,3 @@ FROM [dbo].[FACT_Ad_v2] fact
 LEFT JOIN DIM_Industry_v2 i on fact.IndustryID = i.IndustryID
 LEFT JOIN DIM_Merchant_v2 m on fact.MerchantID = m.MerchantID
 LEFT JOIN DIM_Product_v2 p on fact.ProductID = p.ProductID
-
-select * from DIM_Merchant_v2
-
-		SELECT ProductID FROM DIM_Product_v2
-		WHERE Brand_Product = 'Silk Almond Milk'
-
-			INSERT INTO FACT_Ad_v2
-		VALUES ('2022-01-31', '2022-02-28', '1', '5', '548', '3.99');
