@@ -208,6 +208,8 @@ https://www.youtube.com/watch?v=4cWkVbC2bNE
 				* H-Store is a form of NewSQL
 					* It is feasible to fit databases in RAM in recent times
 
+test update git
+
 
 https://www.youtube.com/watch?v=miEFm1CyjfM
 https://www.youtube.com/watch?v=U0MdznoiCGY
