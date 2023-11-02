@@ -1,2 +1,0 @@
-
-[[DBMS Overview (Cornell)]]
