@@ -47,24 +47,49 @@ CREATE TABLE FACT_Ad (
 	Price DECIMAL(10,2) NOT NULL
 );
 
----------------
+--------------------------------------------------------------------------------------
 
 /*
 	6 queries to drop (completely remove) 6 tables
+	Used because simply emptying tables will not reset auto-increment of primary keys
 */
 
+
+DROP TABLE FACT_Ad;
 DROP TABLE DIM_Industry;
 DROP TABLE DIM_Merchant;
 DROP TABLE DIM_Brand;
 DROP TABLE DIM_Product;
 DROP TABLE DIM_Flyer;
-DROP TABLE FACT_Ad;
 
----------------
+
+--------------------------------------------------------------------------------------
+
+/*
+	creates stored procedure to clear all data from 6 tables
+	Also contains exec command to execute the stored proc
+*/
+
+
+CREATE PROCEDURE EmptyAllTables
+AS
+	DELETE FROM FACT_Ad;
+	DELETE FROM DIM_Industry;
+	DELETE FROM DIM_Merchant;
+	DELETE FROM DIM_Brand;
+	DELETE FROM DIM_Product;
+	DELETE FROM DIM_Flyer;
+GO
+
+
+exec EmptyAllTables
+
+--------------------------------------------------------------------------------------
 
 /*
 	Creates stored procedure used to insert data into dim & fact tables
 */
+
 
 CREATE PROCEDURE InsertNormalizedAd
 	@Industry VARCHAR(50),
@@ -99,31 +124,12 @@ AS
 			@Distinction, @Amount, @MinQuantity, @MaxQuantity, @Price); 
 GO  
 
----------------
-
-/*
-	creates stored procedure to clear all data from 6 tables
-	Also contains exec command to execute the stored proc
-*/
-
-CREATE PROCEDURE EmptyAllTables
-AS
-	DELETE FROM FACT_Ad;
-	DELETE FROM DIM_Industry;
-	DELETE FROM DIM_Merchant;
-	DELETE FROM DIM_Brand;
-	DELETE FROM DIM_Product;
-	DELETE FROM DIM_Flyer;
-GO
-
-
-exec EmptyAllTables
-
----------------
+--------------------------------------------------------------------------------------
 
 /*
 	Query to convert the data stored in dim & fact tables back to spreadsheet format from manual data entry
-	*/
+*/
+
 
 SELECT i.Industry, m.Merchant, b.Brand, p.Product, p.ProductDescription, p.Category, p.GeneralProduct, f.URI, fact.StartDate, fact.EndDate, fact.Distinction, fact.Amount, fact.MinQuantity, fact.MaxQuantity, fact.Price
 FROM [dbo].[FACT_Ad] fact
