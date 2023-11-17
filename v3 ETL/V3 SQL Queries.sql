@@ -1,3 +1,8 @@
+/*
+	5 queries to create 5 tables
+*/
+
+
 CREATE TABLE Staging_v3 (
     AdID INT IDENTITY(1,1) PRIMARY KEY NOT NULL,
 	Load_Date DATE NOT NULL,
@@ -52,32 +57,135 @@ CREATE TABLE FACT_Ad_v3 (
 	Price DECIMAL(10,2) NOT NULL
 );
 
----------------
+--------------------------------------------------------------------------------------
 
-DROP TABLE DIM_Industry_v3;
-DROP TABLE DIM_Merchant_v3;
-DROP TABLE DIM_Product_v3;
-DROP TABLE FACT_Ad_v3;
-DROP TABLE Staging_v3;
+/*
+	creates stored procedure to clear all data from 4 tables and reseed ID
+	Also contains exec command to execute the stored proc
+*/
 
----------------
+
+CREATE PROCEDURE EmptyAllTables_v3
+AS
+    DELETE FROM FACT_Ad_v3;
+    DBCC CHECKIDENT ('FACT_Ad_v3', RESEED, 0);
+    DELETE FROM DIM_Industry_v3;
+    DBCC CHECKIDENT ('DIM_Industry_v3', RESEED, 0);
+    DELETE FROM DIM_Merchant_v3;
+    DBCC CHECKIDENT ('DIM_Merchant_v3', RESEED, 0);
+    DELETE FROM DIM_Product_v3;
+    DBCC CHECKIDENT ('DIM_Product_v3', RESEED, 0);
+    DELETE FROM Staging_v3;
+    DBCC CHECKIDENT ('Staging_v3', RESEED, 0);
+GO
 
 exec EmptyAllTables_v3
 
----------------
+--------------------------------------------------------------------------------------
 
-exec InsertNormalizedAd_v3
-
-
-select count(*) from Staging_v3 where current_price is not null
-select count(*) from FACT_Ad_v3
-select count(*) from DIM_Industry_v3
-select count(*) from DIM_Merchant_v3
-select count(*) from DIM_Product_v3
+/*
+	Creates stored procedure used to insert data into dim & fact tables
+*/
 
 
+CREATE PROCEDURE InsertNormalizedAd_v3
+AS
+BEGIN
+	--declare input attributes and cursor
+	DECLARE @industry VARCHAR(50)
+	DECLARE @merchant VARCHAR(100)
+	DECLARE @brandproduct VARCHAR(100)
+	DECLARE @productcategory VARCHAR(100)
+	DECLARE @prepricetext VARCHAR(100)
+	DECLARE @uri VARCHAR(255)
+	DECLARE @startdate DATE
+	DECLARE @enddate DATE
+	DECLARE @price DECIMAL(10,2)
+	DECLARE @loaddate DATE
+	DECLARE c CURSOR FOR
+	--iterate through staging table
+	SELECT Industry, merchant_name, name, _L2, pre_price_text, clean_image_url, valid_from, valid_to, current_price, Load_Date
+	FROM Staging_v3
+	WHERE current_price IS NOT NULL
+	--map staging attributes to declarations
+	OPEN c
+	FETCH NEXT FROM c INTO @industry, @merchant, @brandproduct, @productcategory, @prepricetext, @uri, @startdate, @enddate, @price, @loaddate
+	--iterate through each record
+	WHILE @@FETCH_STATUS = 0
+	BEGIN
+	--check if industry exists
+		DECLARE @industryid INT;
+		SET @industryid = (
+			SELECT IndustryID FROM DIM_Industry_v3
+			WHERE Industry = @industry
+		);
+		IF @industryid IS NULL
+		BEGIN
+		--insert into dim_industry_v3
+			INSERT INTO DIM_Industry_v3
+				VALUES (@industry);
+		--set @industryid to newly created industryID 
+			SET @industryid = (
+				SELECT IndustryID FROM DIM_Industry_v3
+				WHERE Industry = @industry
+			);
+		END
+	--check if merchant exists
+		DECLARE @merchantid INT;
+		SET @merchantid = (
+			SELECT MerchantID FROM DIM_Merchant_v3
+			WHERE Merchant = @merchant
+		);
+		IF @merchantid IS NULL
+		BEGIN
+		--insert into dim_merchant_v3
+			INSERT INTO DIM_Merchant_v3
+				VALUES (@merchant);
+		--set @merchantid to newly created merchantID 
+			SET @merchantid = (
+				SELECT MerchantID FROM DIM_Merchant_v3
+				WHERE Merchant = @merchant
+			);
+		END
+	--check if product exists
+		DECLARE @productid INT;
+		SET @productid = (
+			SELECT ProductID FROM DIM_Product_v3
+			WHERE Brand_Product = @brandproduct
+		);
+		IF @productid IS NULL
+		BEGIN
+		--insert into dim_product_v3
+			INSERT INTO DIM_Product_v3
+				VALUES (@brandproduct, @productcategory, @prepricetext, @uri);
+		--set @productid to newly created productID 
+			SET @productid = (
+				SELECT ProductID FROM DIM_Product_v3
+				WHERE Brand_Product = @brandproduct
+			);
+		END
+	--insert fact entry
+		INSERT INTO FACT_Ad_v3
+			VALUES (@loaddate, @startdate, @enddate, @industryid, @merchantid, @productid, @price);
+	--fetch new row from cursor
+		FETCH NEXT FROM c INTO @industry, @merchant, @brandproduct, @productcategory, @prepricetext, @uri, @startdate, @enddate, @price, @loaddate
+	END;
+	--close and deallocate the cursor
+	CLOSE c
+	DEALLOCATE c
+	--wipe and reset staging table for next day's load
+	DELETE FROM Staging_v3;
+	DBCC CHECKIDENT ('Staging_v3', RESEED, 0);
+END
+GO
 
---Unnormalize data back to entry spreadsheet
+--------------------------------------------------------------------------------------
+
+/*
+	Query to convert the data stored in dim & fact tables back to spreadsheet format from python history spreadsheet
+*/
+
+
 SELECT i.Industry, m.Merchant, p.Brand_Product, p.Category, p.pre_price_text, fact.LoadDate, fact.Price
 FROM [dbo].[FACT_Ad_v3] fact
 LEFT JOIN DIM_Industry_v3 i on fact.IndustryID = i.IndustryID

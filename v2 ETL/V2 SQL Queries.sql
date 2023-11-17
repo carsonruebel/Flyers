@@ -31,19 +31,6 @@ CREATE TABLE FACT_Ad_v2 (
 	Price DECIMAL(10,2) NOT NULL
 );
 
---------------------------------------------------------------------------------------
-
-/*
-	4 queries to drop (completely remove) 4 tables
-	Used because simply emptying tables will not reset auto-increment of primary keys
-*/
-
-
-DROP TABLE FACT_Ad_v2;
-DROP TABLE DIM_Industry_v2;
-DROP TABLE DIM_Merchant_v2;
-DROP TABLE DIM_Product_v2;
-
 
 --------------------------------------------------------------------------------------
 
@@ -55,10 +42,14 @@ DROP TABLE DIM_Product_v2;
 
 CREATE PROCEDURE EmptyAllTables_v2
 AS
-	DELETE FROM FACT_Ad_v2;
-	DELETE FROM DIM_Industry_v2;
-	DELETE FROM DIM_Merchant_v2;
-	DELETE FROM DIM_Product_v2;
+    DELETE FROM FACT_Ad_v2;
+    DBCC CHECKIDENT ('FACT_Ad_v2', RESEED, 0);
+    DELETE FROM DIM_Industry_v2;
+    DBCC CHECKIDENT ('DIM_Industry_v2', RESEED, 0);
+    DELETE FROM DIM_Merchant_v2;
+    DBCC CHECKIDENT ('DIM_Merchant_v2', RESEED, 0);
+    DELETE FROM DIM_Product_v2;
+    DBCC CHECKIDENT ('DIM_Product_v2', RESEED, 0);
 GO
 
 exec EmptyAllTables_v2

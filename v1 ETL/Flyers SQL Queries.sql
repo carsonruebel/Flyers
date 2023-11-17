@@ -50,22 +50,6 @@ CREATE TABLE FACT_Ad (
 --------------------------------------------------------------------------------------
 
 /*
-	6 queries to drop (completely remove) 6 tables
-	Used because simply emptying tables will not reset auto-increment of primary keys
-*/
-
-
-DROP TABLE FACT_Ad;
-DROP TABLE DIM_Industry;
-DROP TABLE DIM_Merchant;
-DROP TABLE DIM_Brand;
-DROP TABLE DIM_Product;
-DROP TABLE DIM_Flyer;
-
-
---------------------------------------------------------------------------------------
-
-/*
 	creates stored procedure to clear all data from 6 tables
 	Also contains exec command to execute the stored proc
 */
@@ -73,14 +57,19 @@ DROP TABLE DIM_Flyer;
 
 CREATE PROCEDURE EmptyAllTables
 AS
-	DELETE FROM FACT_Ad;
-	DELETE FROM DIM_Industry;
-	DELETE FROM DIM_Merchant;
-	DELETE FROM DIM_Brand;
-	DELETE FROM DIM_Product;
-	DELETE FROM DIM_Flyer;
+    DELETE FROM FACT_Ad;
+    DBCC CHECKIDENT ('FACT_Ad', RESEED, 0);
+    DELETE FROM DIM_Industry;
+    DBCC CHECKIDENT ('DIM_Industry', RESEED, 0);
+    DELETE FROM DIM_Merchant;
+    DBCC CHECKIDENT ('DIM_Merchant', RESEED, 0);
+    DELETE FROM DIM_Brand;
+    DBCC CHECKIDENT ('DIM_Brand', RESEED, 0);
+    DELETE FROM DIM_Product;
+    DBCC CHECKIDENT ('DIM_Product', RESEED, 0);
+    DELETE FROM DIM_Flyer;
+    DBCC CHECKIDENT ('DIM_Flyer', RESEED, 0);
 GO
-
 
 exec EmptyAllTables
 
